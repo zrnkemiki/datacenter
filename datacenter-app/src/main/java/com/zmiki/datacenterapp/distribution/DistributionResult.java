@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DistributionResult {
+    private String message;
     private List<RackDistributionDto> racksWithDevices;
     private List<Device> unplacedDevices;
 }

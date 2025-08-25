@@ -4,6 +4,8 @@ import com.zmiki.datacenterapp.device.Device;
 import com.zmiki.datacenterapp.device.DeviceConverter;
 import com.zmiki.datacenterapp.device.DeviceService;
 import com.zmiki.datacenterapp.device.dto.DeviceDto;
+import com.zmiki.datacenterapp.exception.NoDevicesProvidedException;
+import com.zmiki.datacenterapp.exception.NoRacksProvidedException;
 import com.zmiki.datacenterapp.rack.Rack;
 import com.zmiki.datacenterapp.rack.RackConverter;
 import com.zmiki.datacenterapp.rack.RackService;
@@ -34,10 +36,10 @@ public class DistributionService {
 
     public DistributionResult packDevicesIntoRacks(List<Device> devices, List<Rack> racks) {
         if (racks.isEmpty()) {
-            return DistributionResult.builder()
-                    .racksWithDevices(new ArrayList<>())
-                    .unplacedDevices(new ArrayList<>(devices))
-                    .build();
+            throw new NoRacksProvidedException("No racks provided for device distribution. Cannot proceed.");
+        }
+        if (devices.isEmpty()) {
+            throw new NoDevicesProvidedException("No devices provided for distribution. Cannot proceed.");
         }
 
         List<Rack> racksCopy = racks.stream().map(Rack::copy).toList();
@@ -105,6 +107,7 @@ public class DistributionService {
         }
 
         return DistributionResult.builder()
+                .message(unplacedDevices.isEmpty() ? "Devices successfully distributed" : "Some devices could not be distributed to any rack.")
                 .racksWithDevices(racksWithDevices)
                 .unplacedDevices(unplacedDevices)
                 .build();
